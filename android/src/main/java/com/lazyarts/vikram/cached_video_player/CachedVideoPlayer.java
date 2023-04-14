@@ -47,7 +47,7 @@ final class CachedVideoPlayer {
     private static final String FORMAT_HLS = "hls";
     private static final String FORMAT_OTHER = "other";
 
-    private ExoPlayer exoPlayer;
+    private final ExoPlayer exoPlayer;
 
     private Surface surface;
 
@@ -84,7 +84,9 @@ final class CachedVideoPlayer {
                             context,
                             // TODO: need a way to set these programmatically. Maybe fork VideoPlayerPlatformInterface
                             1024 * 1024 * 1024,
-                            1024 * 1024 * 100);
+                            // smaller file size allows more concurrency, but incurs more overhead because the cache needs to track each file individually
+                            // https://github.com/google/ExoPlayer/issues/4062
+                            1024 * 1024 * 3);
             if (httpHeaders != null && !httpHeaders.isEmpty()) {
                 cacheDataSourceFactory.setHeaders(httpHeaders);
             }
@@ -112,20 +114,20 @@ final class CachedVideoPlayer {
             Uri uri, DataSource.Factory mediaDataSourceFactory, String formatHint, Context context) {
         int type;
         if (formatHint == null) {
-            type = Util.inferContentType(uri.getLastPathSegment());
+            type = Util.inferContentType(uri);
         } else {
             switch (formatHint) {
                 case FORMAT_SS:
-                    type = C.TYPE_SS;
+                    type = C.CONTENT_TYPE_SS;
                     break;
                 case FORMAT_DASH:
-                    type = C.TYPE_DASH;
+                    type = C.CONTENT_TYPE_DASH;
                     break;
                 case FORMAT_HLS:
-                    type = C.TYPE_HLS;
+                    type = C.CONTENT_TYPE_HLS;
                     break;
                 case FORMAT_OTHER:
-                    type = C.TYPE_OTHER;
+                    type = C.CONTENT_TYPE_OTHER;
                     break;
                 default:
                     type = -1;
@@ -133,20 +135,20 @@ final class CachedVideoPlayer {
             }
         }
         switch (type) {
-            case C.TYPE_SS:
+            case C.CONTENT_TYPE_SS:
                 return new SsMediaSource.Factory(
                         new DefaultSsChunkSource.Factory(mediaDataSourceFactory),
                         new DefaultDataSource.Factory(context, mediaDataSourceFactory))
                         .createMediaSource(MediaItem.fromUri(uri));
-            case C.TYPE_DASH:
+            case C.CONTENT_TYPE_DASH:
                 return new DashMediaSource.Factory(
                         new DefaultDashChunkSource.Factory(mediaDataSourceFactory),
                         new DefaultDataSource.Factory(context, mediaDataSourceFactory))
                         .createMediaSource(MediaItem.fromUri(uri));
-            case C.TYPE_HLS:
+            case C.CONTENT_TYPE_HLS:
                 return new HlsMediaSource.Factory(mediaDataSourceFactory)
                         .createMediaSource(MediaItem.fromUri(uri));
-            case C.TYPE_OTHER:
+            case C.CONTENT_TYPE_OTHER:
                 return new ProgressiveMediaSource.Factory(mediaDataSourceFactory)
                         .createMediaSource(MediaItem.fromUri(uri));
             default: {
@@ -212,9 +214,7 @@ final class CachedVideoPlayer {
                     @Override
                     public void onPlayerError(@NonNull PlaybackException error) {
                         setBuffering(false);
-                        if (eventSink != null) {
-                            eventSink.error("VideoError", "Video player had error " + error, null);
-                        }
+                        eventSink.error("VideoError", "Video player had error " + error, null);
                     }
                 });
     }
@@ -230,7 +230,7 @@ final class CachedVideoPlayer {
 
     private static void setAudioAttributes(ExoPlayer exoPlayer, boolean isMixMode) {
         exoPlayer.setAudioAttributes(
-                new AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_MOVIE).build(), !isMixMode);
+                new AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(), !isMixMode);
     }
 
     void play() {

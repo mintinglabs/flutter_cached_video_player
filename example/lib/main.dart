@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 
+// 1.3 MB
+// const String _kDataSource =
+//     'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
+// 158 MB
+const String _kDataSource =
+    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
 void main() {
   runApp(const MyApp());
 }
@@ -50,19 +57,38 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late CachedVideoPlayerController controller;
+
   @override
   void initState() {
-    controller = CachedVideoPlayerController.network(
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
-    controller.initialize().then((value) {
-      controller.play();
-      setState(() {});
-    });
     super.initState();
+
+    controller = CachedVideoPlayerController.network(_kDataSource);
+    controller
+      ..initialize()
+      ..play()
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final CachedVideoPlayerValue playValue = controller.value;
+    final StringBuffer buffer = StringBuffer()
+      ..writeln('isInitialized: ${playValue.isInitialized}')
+      ..writeln('isPlaying: ${playValue.isPlaying}')
+      ..writeln('isBuffering: ${playValue.isBuffering}')
+      ..writeln('buffered: ${playValue.buffered}')
+      ..writeln('position: ${playValue.position}')
+      ..write('duration: ${playValue.duration}');
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -75,12 +101,36 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-          child: controller.value.isInitialized
-              ? AspectRatio(
-                  aspectRatio: controller.value.aspectRatio,
-                  child: CachedVideoPlayer(controller))
-              : const CircularProgressIndicator()), // This trailing comma makes auto-formatting nicer for build methods.
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: CachedVideoPlayer(controller),
+            ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  buffer.toString(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: FloatingActionButton(
+        onPressed: _onTapFAB,
+        child: const Icon(Icons.add),
+      ),
     );
+  }
+
+  void _onTapFAB() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return const MyHomePage(title: 'Flutter Demo Home Page');
+    }));
   }
 }

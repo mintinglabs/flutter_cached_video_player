@@ -2,6 +2,8 @@ package com.lazyarts.vikram.cached_video_player;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
@@ -18,7 +20,7 @@ class CacheDataSourceFactory implements DataSource.Factory {
     private DefaultDataSource.Factory defaultDatasourceFactory;
     private final long maxFileSize, maxCacheSize;
 
-    private DefaultHttpDataSource.Factory defaultHttpDataSourceFactory;
+    private final DefaultHttpDataSource.Factory defaultHttpDataSourceFactory;
 
     CacheDataSourceFactory(Context context, long maxCacheSize, long maxFileSize) {
         super();
@@ -35,6 +37,7 @@ class CacheDataSourceFactory implements DataSource.Factory {
         defaultHttpDataSourceFactory.setDefaultRequestProperties(httpHeaders);
     }
 
+    @NonNull
     @Override
     public DataSource createDataSource() {
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(context).build();
@@ -45,6 +48,8 @@ class CacheDataSourceFactory implements DataSource.Factory {
         SimpleCache simpleCache = SimpleCacheSingleton.getInstance(context, maxCacheSize).simpleCache;
         return new CacheDataSource(simpleCache, defaultDatasourceFactory.createDataSource(),
                 new FileDataSource(), new CacheDataSink(simpleCache, maxFileSize),
+                // ignoring the cache in the case that the part of the media being read is locked
+                // https://github.com/google/ExoPlayer/issues/4062
                 CacheDataSource.FLAG_BLOCK_ON_CACHE | CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null);
     }
 

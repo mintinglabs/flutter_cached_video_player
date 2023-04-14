@@ -31,7 +31,7 @@ public class CachedVideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   private static final String TAG = "VideoPlayerPlugin";
   private final LongSparseArray<CachedVideoPlayer> videoPlayers = new LongSparseArray<>();
   private FlutterState flutterState;
-  private VideoPlayerOptions options = new VideoPlayerOptions();
+  private final VideoPlayerOptions options = new VideoPlayerOptions();
 
   /** Register this with the v2 embedding for the plugin to respond to lifecycle callbacks. */
   public CachedVideoPlayerPlugin() {}
