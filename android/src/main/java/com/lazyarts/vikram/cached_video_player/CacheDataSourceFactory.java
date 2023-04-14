@@ -48,8 +48,9 @@ class CacheDataSourceFactory implements DataSource.Factory {
         SimpleCache simpleCache = SimpleCacheSingleton.getInstance(context, maxCacheSize).simpleCache;
         return new CacheDataSource(simpleCache, defaultDatasourceFactory.createDataSource(),
                 new FileDataSource(), new CacheDataSink(simpleCache, maxFileSize),
-                // ignoring the cache in the case that the part of the media being read is locked
-                // https://github.com/google/ExoPlayer/issues/4062
+                // SimpleCache does indeed have some limitations on concurrent access.
+                // The code below is explicitly requesting blocking in this case, by using FLAG_BLOCK_ON_CACHE.
+                // https://github.com/google/ExoPlayer/issues/8123
                 CacheDataSource.FLAG_BLOCK_ON_CACHE | CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null);
     }
 
