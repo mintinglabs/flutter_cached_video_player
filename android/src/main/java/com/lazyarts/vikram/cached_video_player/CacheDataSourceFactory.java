@@ -46,12 +46,18 @@ class CacheDataSourceFactory implements DataSource.Factory {
         defaultDatasourceFactory.setTransferListener(bandwidthMeter);
 
         SimpleCache simpleCache = SimpleCacheSingleton.getInstance(context, maxCacheSize).simpleCache;
-        return new CacheDataSource(simpleCache, defaultDatasourceFactory.createDataSource(),
-                new FileDataSource(), new CacheDataSink(simpleCache, maxFileSize),
+        return new CacheDataSource(
+                simpleCache,
+                defaultDatasourceFactory.createDataSource(),
+                new FileDataSource(),
+                new CacheDataSink(simpleCache, maxFileSize),
                 // SimpleCache does indeed have some limitations on concurrent access.
                 // The code below is explicitly requesting blocking in this case, by using FLAG_BLOCK_ON_CACHE.
                 // https://github.com/google/ExoPlayer/issues/8123
-                CacheDataSource.FLAG_BLOCK_ON_CACHE | CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null);
+//                CacheDataSource.FLAG_BLOCK_ON_CACHE |
+                CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
+                null
+        );
     }
 
 }

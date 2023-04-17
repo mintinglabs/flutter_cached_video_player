@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 
-// 1.3 MB
+// 2.5 MB
 // const String _kDataSource =
-//     'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4';
+//     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
 // 158 MB
 const String _kDataSource =
     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
@@ -110,12 +110,20 @@ class _MyHomePageState extends State<MyHomePage> {
               aspectRatio: controller.value.aspectRatio,
               child: CachedVideoPlayer(controller),
             ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  buffer.toString(),
-                ),
+            Slider(
+              value: playValue.duration > Duration.zero
+                  ? playValue.position.inMilliseconds /
+                      playValue.duration.inMilliseconds
+                  : 0,
+              onChanged: (double newValue) {
+                final Duration position = playValue.duration * newValue;
+                controller.seekTo(position);
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                buffer.toString(),
               ),
             ),
           ],

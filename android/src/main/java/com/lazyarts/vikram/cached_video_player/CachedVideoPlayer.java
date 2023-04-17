@@ -14,6 +14,7 @@ import android.view.Surface;
 import androidx.annotation.NonNull;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
@@ -32,14 +33,14 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.util.Util;
 
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.view.TextureRegistry;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.view.TextureRegistry;
 
 final class CachedVideoPlayer {
     private static final String FORMAT_SS = "ss";
@@ -73,7 +74,16 @@ final class CachedVideoPlayer {
         this.textureEntry = textureEntry;
         this.options = options;
 
-        exoPlayer = new ExoPlayer.Builder(context).build();
+        exoPlayer = new ExoPlayer.Builder(context)
+                .setLoadControl(new DefaultLoadControl.Builder()
+                        .setBufferDurationsMs(
+                                10_000,
+                                20_000,
+                                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+                        )
+                        .build())
+                .build();
 
         Uri uri = Uri.parse(dataSource);
 
@@ -86,7 +96,7 @@ final class CachedVideoPlayer {
                             1024 * 1024 * 1024,
                             // smaller file size allows more concurrency, but incurs more overhead because the cache needs to track each file individually
                             // https://github.com/google/ExoPlayer/issues/4062
-                            1024 * 1024 * 3);
+                            3 * 1024 * 1024);
             if (httpHeaders != null && !httpHeaders.isEmpty()) {
                 cacheDataSourceFactory.setHeaders(httpHeaders);
             }
