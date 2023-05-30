@@ -15,7 +15,6 @@ flutter:
         pluginClass: CachedVideoPlayerPlugin
       ios:
         pluginClass: CachedVideoPlayerPlugin
-        default_package: video_player_avfoundation
       web:
         default_package: video_player_web
 
@@ -24,7 +23,6 @@ dependencies:
     sdk: flutter
 
   video_player_platform_interface: ^5.1.4
-  video_player_avfoundation: ^2.2.17
 
   # The design on https://flutter.dev/go/federated-plugins was to leave
   # this constraint as "any". We cannot do it right now as it fails pub publish

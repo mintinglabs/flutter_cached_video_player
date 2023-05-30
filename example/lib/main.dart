@@ -5,8 +5,10 @@ import 'package:cached_video_player/cached_video_player.dart';
 // const String _kDataSource =
 //     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
 // 158 MB
-const String _kDataSource =
-    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+// const String _kDataSource =
+//     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+// from Local Assets
+const String _kDataSource = 'videos/wine.mp4';
 
 void main() {
   runApp(const MyApp());
@@ -62,7 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    controller = CachedVideoPlayerController.network(_kDataSource);
+    controller = CachedVideoPlayerController.asset(_kDataSource);
+    // controller = CachedVideoPlayerController.network(_kDataSource);
     controller
       ..initialize()
       ..play()
@@ -106,9 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: CachedVideoPlayer(controller),
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                color: Colors.black,
+                child: CachedVideoPlayer(controller),
+              ),
             ),
             Slider(
               value: playValue.duration > Duration.zero
