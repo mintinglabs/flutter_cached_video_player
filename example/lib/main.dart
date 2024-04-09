@@ -7,8 +7,12 @@ import 'package:cached_video_player/cached_video_player.dart';
 // 158 MB
 // const String _kDataSource =
 //     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
+const String _kDataSource =
+    'https://asset.beebaby.com/chart-smart/uat/2024/03/14/4054e2c2-e1d9-45a5-ae08-9db446bc6862.mp4';
+
 // from Local Assets
-const String _kDataSource = 'videos/wine.mp4';
+// const String _kDataSource = 'videos/wine.mp4';
 
 void main() {
   runApp(const MyApp());
@@ -64,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    controller = CachedVideoPlayerController.asset(_kDataSource);
-    // controller = CachedVideoPlayerController.network(_kDataSource);
+    // controller = CachedVideoPlayerController.asset(_kDataSource);
+    controller = CachedVideoPlayerController.network(_kDataSource);
     controller
       ..initialize()
       ..play()

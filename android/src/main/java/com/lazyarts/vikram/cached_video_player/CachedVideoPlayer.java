@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
@@ -74,7 +75,10 @@ final class CachedVideoPlayer {
         this.textureEntry = textureEntry;
         this.options = options;
 
+        /// https://juejin.cn/post/7170363954265325576#heading-2
+        /// https://github.com/google/ExoPlayer/issues/8987
         exoPlayer = new ExoPlayer.Builder(context)
+                .setRenderersFactory(new DefaultRenderersFactory(context).setEnableDecoderFallback(true))
                 .setLoadControl(new DefaultLoadControl.Builder()
                         .setBufferDurationsMs(
                                 10_000,
