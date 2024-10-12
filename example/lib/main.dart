@@ -11,6 +11,9 @@ import 'package:cached_video_player/cached_video_player.dart';
 const String _kDataSource =
     'https://asset.beebaby.com/chart-smart/uat/2024/03/14/4054e2c2-e1d9-45a5-ae08-9db446bc6862.mp4';
 
+// const String _kDataSource =
+//     'https://dev-cdn.aurapura.app/feed/20240122/kd9sl4k7bi3cl4bjm1n54atkrb-17059080494703.mp4';
+
 // from Local Assets
 // const String _kDataSource = 'videos/wine.mp4';
 

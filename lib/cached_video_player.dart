@@ -16,8 +16,8 @@ import 'src/closed_caption_file.dart';
 export 'src/closed_caption_file.dart';
 
 final VideoPlayerPlatform _videoPlayerPlatform = VideoPlayerPlatform.instance
-  // This will clear all open videos on the platform when a full restart is
-  // performed.
+// This will clear all open videos on the platform when a full restart is
+// performed.
   ..init();
 
 /// The duration, current position, buffering state, error state and settings
@@ -344,6 +344,9 @@ class CachedVideoPlayerController
           break;
         case VideoEventType.bufferingEnd:
           value = value.copyWith(isBuffering: false);
+          break;
+        case VideoEventType.isPlayingStateUpdate:
+          value = value.copyWith(isPlaying: value.isPlaying);
           break;
         case VideoEventType.unknown:
           break;
