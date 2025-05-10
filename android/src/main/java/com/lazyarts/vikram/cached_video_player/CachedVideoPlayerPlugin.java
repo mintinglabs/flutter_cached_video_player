@@ -36,32 +36,8 @@ public class CachedVideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   /** Register this with the v2 embedding for the plugin to respond to lifecycle callbacks. */
   public CachedVideoPlayerPlugin() {}
 
-  @SuppressWarnings("deprecation")
-  private CachedVideoPlayerPlugin(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
-    this.flutterState =
-        new FlutterState(
-            registrar.context(),
-            registrar.messenger(),
-            registrar::lookupKeyForAsset,
-            registrar::lookupKeyForAsset,
-            registrar.textures());
-    flutterState.startListening(this, registrar.messenger());
-  }
-
-  /** Registers this with the stable v1 embedding. Will not respond to lifecycle events. */
-  @SuppressWarnings("deprecation")
-  public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
-    final CachedVideoPlayerPlugin plugin = new CachedVideoPlayerPlugin(registrar);
-    registrar.addViewDestroyListener(
-        view -> {
-          plugin.onDestroy();
-          return false; // We are not interested in assuming ownership of the NativeView.
-        });
-  }
-
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
-
     if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
       try {
         HttpsURLConnection.setDefaultSSLSocketFactory(new CustomSSLSocketFactory());
@@ -104,11 +80,6 @@ public class CachedVideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   }
 
   private void onDestroy() {
-    // The whole FlutterView is being destroyed. Here we release resources acquired for all
-    // instances
-    // of VideoPlayer. Once https://github.com/flutter/flutter/issues/19358 is resolved this may
-    // be replaced with just asserting that videoPlayers.isEmpty().
-    // https://github.com/flutter/flutter/issues/20989 tracks this.
     disposeAllPlayers();
   }
 
